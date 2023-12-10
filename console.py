@@ -24,24 +24,147 @@ class HBNBCommand(cmd.Cmd):
         pass
 
     def do_show(self, arg):
-        """Show command implementation."""
-        # Implement logic to show details of an instance
-        pass
-
+        """Prints the string representation of an instance based on the class name and id."""
+        if not arg:
+            print("** class name missing **")
+            return
+        try:
+            args = arg.split()
+            if args[0] not in classes:
+                print("** class doesn't exist **")
+                return
+            if len(args) < 2:
+                print("** instance id missing **")
+                return
+            instances = storage.all()
+            key = args[0] + '.' + args[1]
+            if key not in instances:
+                print("** no instance found **")
+                return
+            print(instances[key])
+        except IndexError:
+            pass
+    
     def do_destroy(self, arg):
-        """Destroy command implementation."""
-        # Implement logic to delete an instance based on arg
-        pass
+        """Deletes an instance based on the class name and id."""
+        if not arg:
+            print("** class name missing **")
+            return
+        try:
+            args = arg.split()
+            if args[0] not in classes:
+                print("** class doesn't exist **")
+                return
+            if len(args) < 2:
+                print("** instance id missing **")
+                return
+            instances = storage.all()
+            key = args[0] + '.' + args[1]
+            if key not in instances:
+                print("** no instance found **")
+                return
+            del instances[key]
+            storage.save()
+        except IndexError:
+            pass
 
     def do_all(self, arg):
-        """All command implementation."""
-        # Implement logic to show all instances
-        pass
+        """Prints all string representation of all instances based on the class name."""
+        if not arg:
+            print("** class name missing **")
+            return
+        try:
+            instances = storage.all()
+            class_name = arg.split()[0]
+            if class_name not in classes:
+                print("** class doesn't exist **")
+                return
+            print([str(obj) for obj in instances if type(obj).__name__ == class_name])
+        except IndexError:
+            pass
+
 
     def do_update(self, arg):
-        """Update command implementation."""
-        # Implement logic to update an instance
-        pass
+        """Updates an instance based on the class name and id by adding or updating attribute."""
+        if not arg:
+            print("** class name missing **")
+            return
+        try:
+            args = arg.split()
+            if args[0] not in classes:
+                print("** class doesn't exist **")
+                return
+            if len(args) < 2:
+                print("** instance id missing **")
+                return
+            instances = storage.all()
+            key = args[0] + '.' + args[1]
+            if key not in instances:
+                print("** no instance found **")
+                return
+            if len(args) < 3:
+                print("** attribute name missing **")
+                return
+            if len(args) < 4:
+                print("** value missing **")
+                return
+            setattr(instances[key], args[2], args[3])
+            storage.save()
+        except IndexError:
+            pass
+
+
+    def do_count(self, arg):
+        """Counts instances of a class."""
+        if not arg:
+            print("** class name missing **")
+            return
+        try:
+            count = 0
+            instances = storage.all()
+            class_name = arg.split()[0]
+            if class_name not in classes:
+                print("** class doesn't exist **")
+                return
+            for obj in instances:
+                if type(obj).__name__ == class_name:
+                    count += 1
+            print(count)
+        except IndexError:
+            pass
+
+    def do_update_dict(self, arg):
+        """Updates an instance based on the class name and id with a dictionary."""
+        if not arg:
+            print("** class name missing **")
+            return
+        try:
+            args = arg.split()
+            if args[0] not in classes:
+                print("** class doesn't exist **")
+                return
+            if len(args) < 2:
+                print("** instance id missing **")
+                return
+            instances = storage.all()
+            key = args[0] + '.' + args[1]
+            if key not in instances:
+                print("** no instance found **")
+                return
+            if len(args) < 3:
+                print("** dictionary missing **")
+                return
+            try:
+                dict_str = args[2].replace("'", '"')
+                new_dict = json.loads(dict_str)
+            except ValueError:
+                print("** invalid dictionary **")
+                return
+            for k, v in new_dict.items():
+                setattr(instances[key], k, v)
+            storage.save()
+        except IndexError:
+            pass
 
 if __name__ == '__main__':
     HBNBCommand().cmdloop()
