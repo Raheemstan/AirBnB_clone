@@ -1,9 +1,14 @@
 #!/usr/bin/python3
-"""This is the user class"""
+'''
+    Implementation of the User class which inherits from BaseModel
+'''
 from models.base_model import BaseModel
 
+
 class User(BaseModel):
-    """This is the class for user"""
+    '''
+        Definition of the User class
+    '''
     email = ""
     password = ""
     first_name = ""
