@@ -1,15 +1,11 @@
 #!/usr/bin/python3
-'''
-    Implementation of the Review class
-'''
-
+"""Review module"""
 from models.base_model import BaseModel
 
 
 class Review(BaseModel):
-    '''
-        Implementation for the Review.
-    '''
+    """Define a Review class"""
+
     place_id = ""
     user_id = ""
     text = ""

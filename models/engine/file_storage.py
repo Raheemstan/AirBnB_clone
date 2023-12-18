@@ -1,55 +1,39 @@
 #!/usr/bin/python3
-'''
-    Define class FileStorage
-'''
+"""Module: file_storage.py"""
 import json
-import models
+import uuid
+from datetime import datetime
 
 
 class FileStorage:
-    '''
-        Serializes instances to JSON file and deserializes to JSON file.
-    '''
-    __file_path = "file.json"
+    __file_path = 'file.json'
     __objects = {}
 
     def all(self):
-        '''
-            Return the dictionary
-        '''
         return self.__objects
 
     def new(self, obj):
-        '''
-            Set in __objects the obj with key <obj class name>.id
-            Aguments:
-                obj : An instance object.
-        '''
-        key = str(obj.__class__.__name__) + "." + str(obj.id)
-        value_dict = obj
-        FileStorage.__objects[key] = value_dict
+        key = f"{obj.__class__.__name__}.{obj.id}"
+        self.__objects[key] = obj
 
     def save(self):
-        '''
-            Serializes __objects attribute to JSON file.
-        '''
-        objects_dict = {}
-        for key, val in FileStorage.__objects.items():
-            objects_dict[key] = val.to_dict()
-
-        with open(FileStorage.__file_path, mode='w', encoding="UTF8") as fd:
-            json.dump(objects_dict, fd)
+        with open(self.__file_path, 'w') as f:
+            data = {key: obj.to_dict() for key, obj in self.__objects.items()}
+            json.dump(data, f)
 
     def reload(self):
-        '''
-            Deserializes the JSON file to __objects.
-        '''
+        # Import here to avoid circular dependency
+        from models.base_model import BaseModel
         try:
-            with open(FileStorage.__file_path, encoding="UTF8") as fd:
-                FileStorage.__objects = json.load(fd)
-            for key, val in FileStorage.__objects.items():
-                class_name = val["__class__"]
-                class_name = models.classes[class_name]
-                FileStorage.__objects[key] = class_name(**val)
+            with open(self.__file_path, 'r') as f:
+                data = json.load(f)
+            for key, value in data.items():
+                class_name = key.split('.')[0]
+                if class_name == "BaseModel":
+                    obj = BaseModel(**value)
+                    obj.id = value["id"]
+                    obj.updated_at = datetime.fromisoformat(
+                        value["updated_at"])
+                    self.__objects[key] = obj
         except FileNotFoundError:
             pass
