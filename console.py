@@ -158,6 +158,5 @@ class HBNBCommand(cmd.Cmd):
                 setattr(storage.all()[key], arg_list[2], arg_list[3])
                 storage.all()[key].save()
 
-
 if __name__ == '__main__':
     HBNBCommand().cmdloop()
